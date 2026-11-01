@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from .forms import AdoptionRequestForm
 from .models import Pet
@@ -39,14 +41,23 @@ def pet_detail(request, pet_id):
     if request.method == 'POST':
         form = AdoptionRequestForm(request.POST)
         if form.is_valid():
-            adoption_request = form.save(commit=False)
-            adoption_request.pet = pet
-            adoption_request.save()
-            messages.success(
-                request,
-                f'Thank you! Your request to adopt {pet.name} was received. We will contact you soon.',
-            )
-            return redirect('pet_detail', pet_id=pet.id)
+            if settings.DEMO_MODE:
+                # Public demo: validate the form but never store visitors' details
+                messages.success(
+                    request,
+                    f'Thanks for trying the demo! Your request to adopt {pet.name} looks good, '
+                    'but this is a demo site, so nothing was saved or sent.',
+                )
+            else:
+                adoption_request = form.save(commit=False)
+                adoption_request.pet = pet
+                adoption_request.save()
+                messages.success(
+                    request,
+                    f'Thank you! Your request to adopt {pet.name} was received. We will contact you soon.',
+                )
+            # Land on the confirmation message, not back down at the form
+            return redirect(reverse('pet_detail', args=[pet.id]) + '#messages')
     else:
         form = AdoptionRequestForm()
 

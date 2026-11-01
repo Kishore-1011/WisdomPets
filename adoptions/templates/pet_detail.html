@@ -52,6 +52,12 @@
 <section class="adopt-form" id="adopt" aria-labelledby="adopt-title">
     <h2 id="adopt-title">Adopt {{ pet.name|capfirst }}</h2>
     <p>Interested in giving {{ pet.name|capfirst }} a home? Send us a request and our team will be in touch.</p>
+    {% if demo_mode %}
+    <p class="demo-note">
+        <strong>Demo only:</strong> this form checks your details but doesn't save or send them.
+        Feel free to try it with made-up information.
+    </p>
+    {% endif %}
 
     <form method="post" action="{% url 'pet_detail' pet.id %}#adopt" novalidate>
         {% csrf_token %}

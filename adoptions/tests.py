@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from io import StringIO
 
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .forms import AdoptionRequestForm
@@ -106,6 +106,7 @@ class PetDetailViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@override_settings(DEMO_MODE=False)
 class AdoptionRequestTests(TestCase):
     def setUp(self):
         self.pet = make_pet()
@@ -119,7 +120,7 @@ class AdoptionRequestTests(TestCase):
 
     def test_valid_request_is_saved_and_redirects(self):
         response = self.client.post(self.url, self.valid_data, follow=True)
-        self.assertRedirects(response, self.url)
+        self.assertRedirects(response, self.url + '#messages')
         self.assertContains(response, 'Your request to adopt Rio was received')
         request = AdoptionRequest.objects.get()
         self.assertEqual(request.pet, self.pet)
@@ -150,6 +151,44 @@ class AdoptionRequestTests(TestCase):
         response = self.client.post(self.url, self.valid_data)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(AdoptionRequest.objects.count(), 0)
+
+
+class DemoModeTests(TestCase):
+    """The public demo shows a notice and never stores visitors' details."""
+
+    def setUp(self):
+        self.pet = make_pet()
+        self.url = reverse('pet_detail', args=[self.pet.id])
+        self.valid_data = {
+            'full_name': 'Asha Rao',
+            'email': 'asha@example.com',
+            'message': 'I have a big garden.',
+        }
+
+    @override_settings(DEMO_MODE=True)
+    def test_banner_and_form_note_are_shown(self):
+        self.assertContains(self.client.get(reverse('home')), 'Demo site.')
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Demo site.')
+        self.assertContains(response, "doesn't save or send them")
+
+    @override_settings(DEMO_MODE=True)
+    def test_valid_request_is_not_stored(self):
+        response = self.client.post(self.url, self.valid_data, follow=True)
+        self.assertRedirects(response, self.url + '#messages')
+        self.assertContains(response, 'this is a demo site, so nothing was saved or sent')
+        self.assertFalse(AdoptionRequest.objects.exists())
+
+    @override_settings(DEMO_MODE=True)
+    def test_form_still_validates(self):
+        response = self.client.post(self.url, {**self.valid_data, 'email': 'not-an-email'})
+        self.assertIn('email', response.context['form'].errors)
+
+    @override_settings(DEMO_MODE=False)
+    def test_no_banner_when_demo_mode_is_off(self):
+        response = self.client.get(self.url)
+        self.assertNotContains(response, 'Demo site.')
+        self.assertNotContains(response, 'demo-note')
 
 
 class LoadPetDataCommandTests(TestCase):

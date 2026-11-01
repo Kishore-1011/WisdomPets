@@ -36,6 +36,9 @@ if not SECRET_KEY:
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# Public demo: show a "demo site" banner and don't store adoption requests
+DEMO_MODE = os.environ.get('DJANGO_DEMO_MODE', 'False').lower() == 'true'
+
 # Full origins (e.g. https://example.com) allowed to submit forms over HTTPS
 CSRF_TRUSTED_ORIGINS = [
     origin for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin
@@ -84,6 +87,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'adoptions.context_processors.demo_mode',
             ],
         },
     },

@@ -42,6 +42,33 @@ a {
     margin-inline: auto;
 }
 
+/* Space above the confirmation message when the page jumps to it */
+#messages {
+    scroll-margin-top: 1.5rem;
+}
+
+/* Demo notices (shown when DJANGO_DEMO_MODE is on) */
+.demo-banner {
+    padding-block: 0.6rem;
+    background: var(--brown-900);
+    color: var(--gold-100);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.demo-banner strong {
+    color: var(--gold-500);
+}
+
+.demo-note {
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--gold-500);
+    border-radius: 6px;
+    background: var(--gold-100);
+    color: var(--brown-700);
+    font-size: 0.9rem;
+}
+
 /* Header */
 .site-header {
     background: var(--white);

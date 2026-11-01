@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+    {% if demo_mode %}
+    <div class="demo-banner" role="note">
+        <div class="container">
+            <strong>Demo site.</strong> Wisdom Pet Medicine is a fictional clinic, and these pets aren't real.
+            Adoption requests are not stored or sent, so please don't enter real personal details.
+        </div>
+    </div>
+    {% endif %}
     <header class="site-header">
         <div class="container">
             <a class="site-logo" href="{% url 'home' %}">
@@ -25,7 +33,7 @@
 
     <main class="container">
         {% if messages %}
-        <ul class="messages">
+        <ul class="messages" id="messages">
             {% for message in messages %}
             <li class="message message-{{ message.tags }}" role="status">{{ message }}</li>
             {% endfor %}
