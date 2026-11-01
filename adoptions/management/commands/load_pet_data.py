@@ -40,7 +40,7 @@ class Command(BaseCommand):
             vac = Vaccine(name=vaccine_name)
             vac.save()
         print("Loading pet data for pets available for adoption")
-        with open(settings.BASE_DIR / 'pet_data.csv', newline='') as csv_file:
+        with open(settings.BASE_DIR / 'pet_data.csv', newline='', encoding='utf-8') as csv_file:
             for row in DictReader(csv_file):
                 pet = Pet()
                 pet.name = row['Pet']
