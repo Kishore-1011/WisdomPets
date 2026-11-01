@@ -1,31 +1,51 @@
 {% extends "base.html" %}
+
+{% block title %}{{ pet.name|capfirst }}{% endblock %}
+
 {% block content %}
-<div>
-    <h3>{{ pet.name|capfirst }}</h3>
-    <p>{{ pet.species }}</p>
-    {% if pet.breed %}
-        <p>Breed: {{ pet.breed }}</p>
-    {% endif %}
-    {% if pet.age %}
-        <p>Age: {{ pet.age }}</p>
-    {% endif %}
-    {% if pet.sex %}
-        {% if pet.sex == "M" %}
-            <p>Sex: Male</p>
-        {% else %}
-            <p>Sex: Female</p>
-        {% endif %}    
-    {% endif %}
-    {% if pet.vaccinations.all %}
-        <p>Vaccinations for:</p>
-        <ul>
-            {% for vaccination in pet.vaccinations.all %}
-                <li>{{ vaccination.name }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    <p>Submitted by: {{ pet.submitter }}</p>
-    <p>Submitted on: {{ pet.submission_date|date:"M d Y" }}</p>
-    <p>{{ pet.description }}</p>
-</div>
+<a class="back-link" href="{% url 'home' %}">&larr; All pets</a>
+
+<article class="pet-detail">
+    <span class="badge">{{ pet.species }}</span>
+    <h2>{{ pet.name|capfirst }}</h2>
+    <p class="description">{{ pet.description }}</p>
+
+    <dl class="facts">
+        {% if pet.breed %}
+        <dt>Breed</dt>
+        <dd>{{ pet.breed }}</dd>
+        {% endif %}
+
+        {% if pet.age is not None %}
+        <dt>Age</dt>
+        <dd>{% if pet.age == 0 %}Under 1 year{% else %}{{ pet.age }} year{{ pet.age|pluralize }}{% endif %}</dd>
+        {% endif %}
+
+        {% if pet.sex %}
+        <dt>Sex</dt>
+        <dd>{{ pet.get_sex_display }}</dd>
+        {% endif %}
+
+        <dt>Submitted by</dt>
+        <dd>{{ pet.submitter }}</dd>
+
+        <dt>Submitted on</dt>
+        <dd>{{ pet.submission_date|date:"M d, Y" }}</dd>
+
+        <dt>Vaccinations</dt>
+        <dd>
+            {% with vaccinations=pet.vaccinations.all %}
+            {% if vaccinations %}
+            <ul class="badge-list">
+                {% for vaccination in vaccinations %}
+                <li class="badge">{{ vaccination.name }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            None recorded
+            {% endif %}
+            {% endwith %}
+        </dd>
+    </dl>
+</article>
 {% endblock %}

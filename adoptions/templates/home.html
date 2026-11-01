@@ -1,17 +1,32 @@
 {% extends "base.html" %}
-{% block content %}
-<div>
-    {% for pet in pets %}
-        <div class="petname">
-            <a href="{% url 'pet_detail' pet.id %}">
-            <h3>{{ pet.name|capfirst }}</h3>
-            </a>
-            <p>{{ pet.species }}</p>
-            {% if pet.breed %}
-                <p>Breed: {{ pet.breed }}</p>
-            {% endif %}
-            <p class="hidden">{{ pet.description }}</p>
-        </div>
-    {% endfor %}
+{% load static %}
+
+{% block hero %}
+<div class="hero">
+    <img src="{% static 'header.jpg' %}" alt="A row of dogs, cats, birds, fish and small pets">
 </div>
+{% endblock %}
+
+{% block content %}
+<p class="intro">Wisdom Pet Medicine blends the best of traditional and alternative medicine to care for companion animals, including dogs, cats, birds, reptiles, rodents, and fish. Meet the pets below who are waiting for a new home.</p>
+
+<h2 class="section-title">Pets available for adoption</h2>
+
+{% if pets %}
+<ul class="pet-grid">
+    {% for pet in pets %}
+    <li>
+        <a class="pet-card" href="{% url 'pet_detail' pet.id %}">
+            <span class="badge">{{ pet.species }}</span>
+            <h3>{{ pet.name|capfirst }}</h3>
+            <p class="breed">{% if pet.breed %}{{ pet.breed }}{% else %}Breed unknown{% endif %}</p>
+            <p class="summary">{{ pet.description|truncatewords:18 }}</p>
+            <span class="more">Meet {{ pet.name|capfirst }} &rarr;</span>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="empty-state">No pets are listed right now. Please check back soon.</p>
+{% endif %}
 {% endblock %}
