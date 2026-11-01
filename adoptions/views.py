@@ -1,6 +1,8 @@
+from django.contrib import messages
 from django.db.models import Q
-from django.shortcuts import render
-from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import AdoptionRequestForm
 from .models import Pet
 
 # Create your views here.
@@ -32,9 +34,20 @@ def home(request):
 
 
 def pet_detail(request, pet_id):
-    try:
-        pet = Pet.objects.get(id = pet_id)
-    except Pet.DoesNotExist:
-        raise Http404('Pet not found')
-    
-    return render(request, 'pet_detail.html', {'pet':pet})
+    pet = get_object_or_404(Pet, id=pet_id)
+
+    if request.method == 'POST':
+        form = AdoptionRequestForm(request.POST)
+        if form.is_valid():
+            adoption_request = form.save(commit=False)
+            adoption_request.pet = pet
+            adoption_request.save()
+            messages.success(
+                request,
+                f'Thank you! Your request to adopt {pet.name} was received. We will contact you soon.',
+            )
+            return redirect('pet_detail', pet_id=pet.id)
+    else:
+        form = AdoptionRequestForm()
+
+    return render(request, 'pet_detail.html', {'pet': pet, 'form': form})

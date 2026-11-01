@@ -48,4 +48,26 @@
         </dd>
     </dl>
 </article>
+
+<section class="adopt-form" id="adopt" aria-labelledby="adopt-title">
+    <h2 id="adopt-title">Adopt {{ pet.name|capfirst }}</h2>
+    <p>Interested in giving {{ pet.name|capfirst }} a home? Send us a request and our team will be in touch.</p>
+
+    <form method="post" action="{% url 'pet_detail' pet.id %}#adopt" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% for field in form %}
+        <div class="form-field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}
+            <p class="field-error">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button class="button" type="submit">Send adoption request</button>
+    </form>
+</section>
 {% endblock %}

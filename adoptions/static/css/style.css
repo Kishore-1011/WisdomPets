@@ -312,6 +312,87 @@ main {
     margin: 0;
 }
 
+/* Adoption form */
+.adopt-form {
+    max-width: 720px;
+    margin-top: 2rem;
+    padding: 2rem;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--gold-500);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.adopt-form h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.5rem;
+}
+
+.adopt-form > p {
+    margin: 0 0 1.5rem;
+    color: var(--brown-500);
+}
+
+.form-field {
+    margin-bottom: 1.1rem;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+}
+
+.form-field input,
+.form-field textarea {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    font: inherit;
+    color: inherit;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+    outline: 2px solid var(--gold-500);
+    outline-offset: 1px;
+}
+
+.form-field.has-error input,
+.form-field.has-error textarea {
+    border-color: #b3261e;
+}
+
+.field-error,
+.form-errors {
+    margin: 0.35rem 0 0;
+    color: #b3261e;
+    font-size: 0.9rem;
+}
+
+/* Flash messages */
+.messages {
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+}
+
+.message {
+    padding: 0.9rem 1.1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--white);
+}
+
+.message-success {
+    border-color: #9cc5a1;
+    background: #eef7ef;
+    color: #1e4d26;
+}
+
 .empty-state {
     padding: 2rem;
     text-align: center;
@@ -335,7 +416,8 @@ main {
         font-size: 1.2rem;
     }
 
-    .pet-detail {
+    .pet-detail,
+    .adopt-form {
         padding: 1.25rem;
     }
 
