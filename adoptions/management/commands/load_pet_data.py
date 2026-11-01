@@ -1,10 +1,10 @@
 from csv import DictReader
-from datetime import datetime
+from datetime import datetime, timezone
 
+from django.conf import settings
 from django.core.management import BaseCommand
 
 from adoptions.models import Pet, Vaccine
-from pytz import UTC
 
 
 DATETIME_FORMAT = '%m/%d/%Y %H:%M'
@@ -40,23 +40,24 @@ class Command(BaseCommand):
             vac = Vaccine(name=vaccine_name)
             vac.save()
         print("Loading pet data for pets available for adoption")
-        for row in DictReader(open('./pet_data.csv')):
-            pet = Pet()
-            pet.name = row['Pet']
-            pet.submitter = row['Submitter']
-            pet.species = row['Species']
-            pet.breed = row['Breed']
-            pet.description = row['Pet Description']
-            pet.sex = row['Sex']
-            pet.age = row['Age']
-            raw_submission_date = row['submission date']
-            submission_date = UTC.localize(
-                datetime.strptime(raw_submission_date, DATETIME_FORMAT))
-            pet.submission_date = submission_date
-            pet.save()
-            raw_vaccination_names = row['vaccinations']
-            vaccination_names = [name for name in raw_vaccination_names.split('| ') if name]
-            for vac_name in vaccination_names:
-                vac = Vaccine.objects.get(name=vac_name)
-                pet.vaccinations.add(vac)
-            pet.save()
+        with open(settings.BASE_DIR / 'pet_data.csv', newline='') as csv_file:
+            for row in DictReader(csv_file):
+                pet = Pet()
+                pet.name = row['Pet']
+                pet.submitter = row['Submitter']
+                pet.species = row['Species']
+                pet.breed = row['Breed']
+                pet.description = row['Pet Description']
+                pet.sex = row['Sex']
+                pet.age = row['Age']
+                raw_submission_date = row['submission date']
+                submission_date = datetime.strptime(
+                    raw_submission_date, DATETIME_FORMAT).replace(tzinfo=timezone.utc)
+                pet.submission_date = submission_date
+                pet.save()
+                raw_vaccination_names = row['vaccinations']
+                vaccination_names = [name for name in raw_vaccination_names.split('| ') if name]
+                for vac_name in vaccination_names:
+                    vac = Vaccine.objects.get(name=vac_name)
+                    pet.vaccinations.add(vac)
+                pet.save()
