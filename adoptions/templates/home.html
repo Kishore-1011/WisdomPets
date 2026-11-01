@@ -10,7 +10,30 @@
 {% block content %}
 <p class="intro">Wisdom Pet Medicine blends the best of traditional and alternative medicine to care for companion animals, including dogs, cats, birds, reptiles, rodents, and fish. Meet the pets below who are waiting for a new home.</p>
 
-<h2 class="section-title">Pets available for adoption</h2>
+<h2 class="section-title" id="pets">Pets available for adoption</h2>
+
+<form class="filters" method="get" action="{% url 'home' %}#pets" role="search">
+    <label class="visually-hidden" for="search">Search pets</label>
+    <input class="search-input" type="search" id="search" name="q" value="{{ query }}" placeholder="Search by name, breed or description">
+    {% if selected_species %}<input type="hidden" name="species" value="{{ selected_species }}">{% endif %}
+    <button class="button" type="submit">Search</button>
+</form>
+
+<ul class="species-filter" aria-label="Filter by species">
+    <li><a class="chip{% if not selected_species %} is-active{% endif %}" href="{% querystring species=None %}#pets">All</a></li>
+    {% for name in species_list %}
+    <li><a class="chip{% if name|lower == selected_species|lower %} is-active{% endif %}" href="{% querystring species=name %}#pets">{{ name }}</a></li>
+    {% endfor %}
+</ul>
+
+{% if is_filtered %}
+<p class="result-count">
+    {{ pets|length }} pet{{ pets|length|pluralize }} found
+    {% if query %}for &ldquo;{{ query }}&rdquo;{% endif %}
+    {% if selected_species %}in {{ selected_species }}{% endif %}
+    &middot; <a href="{% url 'home' %}#pets">Clear filters</a>
+</p>
+{% endif %}
 
 {% if pets %}
 <ul class="pet-grid">
@@ -27,6 +50,10 @@
     {% endfor %}
 </ul>
 {% else %}
+{% if is_filtered %}
+<p class="empty-state">No pets match your search. <a href="{% url 'home' %}#pets">See all pets</a></p>
+{% else %}
 <p class="empty-state">No pets are listed right now. Please check back soon.</p>
+{% endif %}
 {% endif %}
 {% endblock %}

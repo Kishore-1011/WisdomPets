@@ -183,6 +183,88 @@ main {
     list-style: none;
 }
 
+/* Search and filters */
+.filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    font: inherit;
+    color: inherit;
+}
+
+.search-input:focus {
+    outline: 2px solid var(--gold-500);
+    outline-offset: 1px;
+}
+
+.button {
+    padding: 0.65rem 1.25rem;
+    border: 0;
+    border-radius: 8px;
+    background: var(--brown-700);
+    color: var(--white);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.button:hover {
+    background: var(--brown-900);
+}
+
+.species-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+}
+
+.chip {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--brown-700);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.chip:hover {
+    border-color: var(--gold-500);
+}
+
+.chip.is-active {
+    background: var(--brown-700);
+    border-color: var(--brown-700);
+    color: var(--white);
+}
+
+.result-count {
+    margin: 0 0 1.25rem;
+    color: var(--brown-500);
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
 /* Pet detail */
 .back-link {
     display: inline-block;
