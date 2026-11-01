@@ -6,6 +6,8 @@
 
 A Django web app for a fictional veterinary clinic that lists pets available for adoption. Visitors can search and filter pets, view their details and vaccinations, and send an adoption request. Clinic staff review and track requests in the Django admin.
 
+**🔗 Live demo: [kishore1011.pythonanywhere.com](https://kishore1011.pythonanywhere.com)**
+
 ![Home page with search and species filter](docs/screenshots/search.png)
 
 ## Features
@@ -59,6 +61,18 @@ Settings are read from environment variables (or a `.env` file):
 | `DJANGO_DEBUG` | Turns on debug mode | `False` |
 | `DJANGO_SECRET_KEY` | Secret key; required when debug is off | dev-only key when debug is on |
 | `DJANGO_ALLOWED_HOSTS` | Comma-separated host names | `localhost,127.0.0.1` |
+
+## Deployment
+
+The live demo runs on [PythonAnywhere](https://www.pythonanywhere.com) with `DJANGO_DEBUG=False`, static files served by WhiteNoise, and HTTPS enforced. To update it after pushing changes:
+
+```bash
+cd ~/WisdomPets && source .venv/bin/activate
+git pull && pip install -r requirements.txt
+python manage.py migrate && python manage.py collectstatic --noinput
+```
+
+Then reload the web app from the PythonAnywhere **Web** tab.
 
 ## Running tests
 
