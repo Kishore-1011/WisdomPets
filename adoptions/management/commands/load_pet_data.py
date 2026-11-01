@@ -19,7 +19,7 @@ VACCINES_NAMES = [
     'Feline Leukemia'
 ]
 
-ALREDY_LOADED_ERROR_MESSAGE = """
+ALREADY_LOADED_ERROR_MESSAGE = """
 If you need to reload the pet data from the CSV file,
 first delete the db.sqlite3 file to destroy the database.
 Then, run `python manage.py migrate` for a new empty
@@ -28,18 +28,18 @@ database with tables"""
 
 class Command(BaseCommand):
     # Show this when the user types help
-    help = "Loads data from pet_data.csv into our Pet mode"
+    help = "Loads data from pet_data.csv into the Pet model"
 
     def handle(self, *args, **options):
         if Vaccine.objects.exists() or Pet.objects.exists():
-            print('Pet data already loaded...exiting.')
-            print(ALREDY_LOADED_ERROR_MESSAGE)
+            self.stdout.write('Pet data already loaded...exiting.')
+            self.stdout.write(ALREADY_LOADED_ERROR_MESSAGE)
             return
-        print("Creating vaccine data")
+        self.stdout.write("Creating vaccine data")
         for vaccine_name in VACCINES_NAMES:
             vac = Vaccine(name=vaccine_name)
             vac.save()
-        print("Loading pet data for pets available for adoption")
+        self.stdout.write("Loading pet data for pets available for adoption")
         with open(settings.BASE_DIR / 'pet_data.csv', newline='', encoding='utf-8') as csv_file:
             for row in DictReader(csv_file):
                 pet = Pet()
