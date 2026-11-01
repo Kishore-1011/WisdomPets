@@ -7,6 +7,7 @@
 A Django web app for a fictional veterinary clinic that lists pets available for adoption. Visitors can search and filter pets, view their details and vaccinations, and send an adoption request. Clinic staff review and track requests in the Django admin.
 
 **🔗 Live demo: [kishore1011.pythonanywhere.com](https://kishore1011.pythonanywhere.com)**
+(runs in demo mode: the adoption form works, but nothing you enter is stored or sent)
 
 ![Home page with search and species filter](docs/screenshots/search.png)
 
@@ -17,8 +18,9 @@ A Django web app for a fictional veterinary clinic that lists pets available for
 - **Pet detail pages** with age, sex, submitter and vaccination records
 - **Adoption request form** with validation (email, optional phone) and CSRF protection; a confirmation message is shown after submitting
 - **Staff admin** to manage pets and adoption requests, with status tracking (New → Contacted → Approved / Declined), filters and search
+- **Demo mode** for public deployments: a site-wide notice, and the adoption form validates but never stores visitors' details
 - **CSV data import** through a custom management command
-- **Automated tests** (21) running on GitHub Actions for Python 3.12 and 3.13
+- **Automated tests** (25) running on GitHub Actions for Python 3.12 and 3.13
 
 | Pet details and adoption form | Mobile view |
 |---|---|
@@ -61,10 +63,14 @@ Settings are read from environment variables (or a `.env` file):
 | `DJANGO_DEBUG` | Turns on debug mode | `False` |
 | `DJANGO_SECRET_KEY` | Secret key; required when debug is off | dev-only key when debug is on |
 | `DJANGO_ALLOWED_HOSTS` | Comma-separated host names | `localhost,127.0.0.1` |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | Full origins allowed to submit forms over HTTPS | empty |
+| `DJANGO_DEMO_MODE` | Shows a "demo site" banner and stops adoption requests from being stored | `False` |
 
 ## Deployment
 
-The live demo runs on [PythonAnywhere](https://www.pythonanywhere.com) with `DJANGO_DEBUG=False`, static files served by WhiteNoise, and HTTPS enforced. To update it after pushing changes:
+The live demo runs on [PythonAnywhere](https://www.pythonanywhere.com) with `DJANGO_DEBUG=False`, `DJANGO_DEMO_MODE=True`, static files served by WhiteNoise, and HTTPS enforced. Because it's a public demo of a fictional clinic, it never stores the names, emails or phone numbers people type into the form. Run it locally with demo mode off to see requests arrive in the admin.
+
+To update the live site after pushing changes:
 
 ```bash
 cd ~/WisdomPets && source .venv/bin/activate
