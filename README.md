@@ -15,12 +15,12 @@ A Django web app for a fictional veterinary clinic that lists pets available for
 
 - **Pet listings** in a responsive card grid, with breed, species and a short description
 - **Search** across name, breed and description, combined with a **species filter**; filters live in the URL, so results can be shared or bookmarked
-- **Pet detail pages** with age, sex, submitter and vaccination records
+- **Pet detail pages** with age, sex, submitter and vaccination records, plus a **photo of each pet** that opens in a larger viewer
 - **Adoption request form** with validation (email, optional phone) and CSRF protection; a confirmation message is shown after submitting
 - **Staff admin** to manage pets and adoption requests, with status tracking (New → Contacted → Approved / Declined), filters and search
 - **Demo mode** for public deployments: a site-wide notice, and the adoption form validates but never stores visitors' details
 - **CSV data import** through a custom management command
-- **Automated tests** (25) running on GitHub Actions for Python 3.12 and 3.13
+- **Automated tests** (28) running on GitHub Actions for Python 3.12 and 3.13
 
 | Pet details and adoption form | Mobile view |
 |---|---|
@@ -119,3 +119,7 @@ This project started from the LinkedIn Learning *Learning Django* course, which 
 - Bug fixes in the CSV import (character encoding, file handling)
 
 Wisdom Pet Medicine is a fictional brand created by Lynda.com (LinkedIn Learning) for training purposes.
+
+## Photo credits
+
+The pet photos are illustrative images from [Wikimedia Commons](https://commons.wikimedia.org), used under their free licences (public domain, CC0, CC BY and CC BY-SA). Each pet page credits the photographer and licence under the photo, and the full list of authors, licences and source pages is in [`adoptions/pet_photos.py`](adoptions/pet_photos.py). Images were resized and compressed for the web; no other changes were made.
