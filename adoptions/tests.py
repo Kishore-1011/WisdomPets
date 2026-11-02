@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from io import StringIO
+from pathlib import Path
 
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -81,6 +82,32 @@ class HomeViewTests(TestCase):
     def test_search_input_is_escaped(self):
         response = self.get(q='<script>alert(1)</script>')
         self.assertNotContains(response, '<script>alert(1)</script>')
+
+
+class PetPhotoTests(TestCase):
+    def test_every_pet_in_the_csv_has_a_photo_file(self):
+        call_command('load_pet_data', stdout=StringIO())
+        static_dir = Path(__file__).resolve().parent / 'static'
+        for pet in Pet.objects.all():
+            with self.subTest(pet=pet.name):
+                self.assertIsNotNone(pet.photo)
+                self.assertTrue((static_dir / pet.photo['path']).exists())
+                self.assertTrue(pet.photo['author'] and pet.photo['licence_url'].startswith('https://'))
+
+    def test_photo_and_credit_shown_on_pet_page(self):
+        pet = make_pet()
+        response = self.client.get(reverse('pet_detail', args=[pet.id]))
+        self.assertContains(response, 'pets/rio')
+        self.assertContains(response, 'Illustrative photo: French bulldog')
+        self.assertContains(response, 'via Wikimedia Commons')
+        self.assertContains(response, 'id="photo-viewer"')
+
+    def test_placeholder_when_no_photo(self):
+        pet = make_pet(name='Newcomer')
+        self.assertIsNone(pet.photo)
+        response = self.client.get(reverse('pet_detail', args=[pet.id]))
+        self.assertContains(response, 'Photo coming soon')
+        self.assertNotContains(response, 'id="photo-viewer"')
 
 
 class PetDetailViewTests(TestCase):

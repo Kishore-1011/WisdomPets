@@ -1,79 +1,140 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ pet.name|capfirst }}{% endblock %}
 
 {% block content %}
 <a class="back-link" href="{% url 'home' %}">&larr; All pets</a>
 
-<article class="pet-detail">
-    <span class="badge">{{ pet.species }}</span>
-    <h2>{{ pet.name|capfirst }}</h2>
-    <p class="description">{{ pet.description }}</p>
+<div class="pet-layout">
+    <div class="pet-main">
+        <article class="pet-detail">
+            <span class="badge">{{ pet.species }}</span>
+            <h2>{{ pet.name|capfirst }}</h2>
+            <p class="description">{{ pet.description }}</p>
 
-    <dl class="facts">
-        {% if pet.breed %}
-        <dt>Breed</dt>
-        <dd>{{ pet.breed }}</dd>
-        {% endif %}
+            <dl class="facts">
+                {% if pet.breed %}
+                <dt>Breed</dt>
+                <dd>{{ pet.breed }}</dd>
+                {% endif %}
 
-        {% if pet.age is not None %}
-        <dt>Age</dt>
-        <dd>{% if pet.age == 0 %}Under 1 year{% else %}{{ pet.age }} year{{ pet.age|pluralize }}{% endif %}</dd>
-        {% endif %}
+                {% if pet.age is not None %}
+                <dt>Age</dt>
+                <dd>{% if pet.age == 0 %}Under 1 year{% else %}{{ pet.age }} year{{ pet.age|pluralize }}{% endif %}</dd>
+                {% endif %}
 
-        {% if pet.sex %}
-        <dt>Sex</dt>
-        <dd>{{ pet.get_sex_display }}</dd>
-        {% endif %}
+                {% if pet.sex %}
+                <dt>Sex</dt>
+                <dd>{{ pet.get_sex_display }}</dd>
+                {% endif %}
 
-        <dt>Submitted by</dt>
-        <dd>{{ pet.submitter }}</dd>
+                <dt>Submitted by</dt>
+                <dd>{{ pet.submitter }}</dd>
 
-        <dt>Submitted on</dt>
-        <dd>{{ pet.submission_date|date:"M d, Y" }}</dd>
+                <dt>Submitted on</dt>
+                <dd>{{ pet.submission_date|date:"M d, Y" }}</dd>
 
-        <dt>Vaccinations</dt>
-        <dd>
-            {% with vaccinations=pet.vaccinations.all %}
-            {% if vaccinations %}
-            <ul class="badge-list">
-                {% for vaccination in vaccinations %}
-                <li class="badge">{{ vaccination.name }}</li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            None recorded
+                <dt>Vaccinations</dt>
+                <dd>
+                    {% with vaccinations=pet.vaccinations.all %}
+                    {% if vaccinations %}
+                    <ul class="badge-list">
+                        {% for vaccination in vaccinations %}
+                        <li class="badge">{{ vaccination.name }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    None recorded
+                    {% endif %}
+                    {% endwith %}
+                </dd>
+            </dl>
+        </article>
+
+        <section class="adopt-form" id="adopt" aria-labelledby="adopt-title">
+            <h2 id="adopt-title">Adopt {{ pet.name|capfirst }}</h2>
+            <p>Interested in giving {{ pet.name|capfirst }} a home? Send us a request and our team will be in touch.</p>
+            {% if demo_mode %}
+            <p class="demo-note">
+                <strong>Demo only:</strong> this form checks your details but doesn't save or send them.
+                Feel free to try it with made-up information.
+            </p>
             {% endif %}
-            {% endwith %}
-        </dd>
-    </dl>
-</article>
 
-<section class="adopt-form" id="adopt" aria-labelledby="adopt-title">
-    <h2 id="adopt-title">Adopt {{ pet.name|capfirst }}</h2>
-    <p>Interested in giving {{ pet.name|capfirst }} a home? Send us a request and our team will be in touch.</p>
-    {% if demo_mode %}
-    <p class="demo-note">
-        <strong>Demo only:</strong> this form checks your details but doesn't save or send them.
-        Feel free to try it with made-up information.
-    </p>
-    {% endif %}
+            <form method="post" action="{% url 'pet_detail' pet.id %}#adopt" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="form-errors">{{ form.non_field_errors }}</div>
+                {% endif %}
+                {% for field in form %}
+                <div class="form-field{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                    <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                <button class="button" type="submit">Send adoption request</button>
+            </form>
+        </section>
+    </div>
 
-    <form method="post" action="{% url 'pet_detail' pet.id %}#adopt" novalidate>
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-        <div class="form-errors">{{ form.non_field_errors }}</div>
-        {% endif %}
-        {% for field in form %}
-        <div class="form-field{% if field.errors %} has-error{% endif %}">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% for error in field.errors %}
-            <p class="field-error">{{ error }}</p>
-            {% endfor %}
+    <aside class="pet-photo" aria-label="Photo of {{ pet.name|capfirst }}">
+        {% with photo=pet.photo %}
+        {% if photo %}
+        <figure class="photo-card">
+            <button class="photo-open" type="button" data-photo-open aria-haspopup="dialog"
+                    aria-label="View a larger photo of {{ pet.name|capfirst }}">
+                <img src="{% static photo.path %}" alt="{{ pet.breed|default:pet.species }}, pictured for {{ pet.name|capfirst }}"
+                     width="900" height="675" loading="eager">
+                <span class="photo-zoom" aria-hidden="true">&#x2922; View larger</span>
+            </button>
+            <figcaption>
+                Illustrative photo: {{ pet.breed|default:pet.species }}
+                <span class="photo-credit">
+                    Photo: <a href="{{ photo.source }}" target="_blank" rel="noopener">{{ photo.author }}</a>,
+                    <a href="{{ photo.licence_url }}" target="_blank" rel="noopener">{{ photo.licence }}</a>, via Wikimedia Commons
+                </span>
+            </figcaption>
+        </figure>
+
+        <dialog class="photo-viewer" id="photo-viewer" aria-label="Photo of {{ pet.name|capfirst }}">
+            <button class="viewer-close" type="button" data-photo-close aria-label="Close photo">&times;</button>
+            <img src="{% static photo.path %}" alt="{{ pet.breed|default:pet.species }}, pictured for {{ pet.name|capfirst }}">
+            <p class="viewer-caption">
+                <span><strong>{{ pet.name|capfirst }}</strong> · {{ pet.breed|default:pet.species }}</span>
+                <span class="viewer-credit">Photo: {{ photo.author }} ({{ photo.licence }})</span>
+            </p>
+        </dialog>
+        {% else %}
+        <div class="photo-placeholder">
+            <span aria-hidden="true">&#x1F43E;</span>
+            <p>Photo coming soon</p>
         </div>
-        {% endfor %}
-        <button class="button" type="submit">Send adoption request</button>
-    </form>
-</section>
+        {% endif %}
+        {% endwith %}
+    </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Photo viewer: open the larger photo in a dialog; close with the button, Esc, or a click outside it
+    (function () {
+        var viewer = document.getElementById('photo-viewer');
+        var opener = document.querySelector('[data-photo-open]');
+        if (!viewer || !opener || typeof viewer.showModal !== 'function') {
+            return;
+        }
+        opener.addEventListener('click', function () { viewer.showModal(); });
+        viewer.querySelector('[data-photo-close]').addEventListener('click', function () { viewer.close(); });
+        viewer.addEventListener('click', function (event) {
+            if (event.target === viewer) {
+                viewer.close();
+            }
+        });
+    })();
+</script>
 {% endblock %}

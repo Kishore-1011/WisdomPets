@@ -1,5 +1,7 @@
 from django.db import models
 
+from .pet_photos import PET_PHOTOS
+
 # Create your models here.
 class Pet(models.Model):
     SEX_CHOICE = [('M','Male'),('F','Female')]
@@ -12,6 +14,21 @@ class Pet(models.Model):
     submission_date = models.DateTimeField()
     age = models.IntegerField(null=True)
     vaccinations = models.ManyToManyField('Vaccine', blank=True)
+
+    @property
+    def photo(self):
+        """Photo and credit for this pet, or None if there isn't one."""
+        entry = PET_PHOTOS.get(self.name.lower())
+        if entry is None:
+            return None
+        author, licence, licence_url, source = entry
+        return {
+            'path': f'pets/{self.name.lower()}.jpg',
+            'author': author,
+            'licence': licence,
+            'licence_url': licence_url,
+            'source': source,
+        }
 
     def __str__(self):
         return f'{self.name} ({self.species})'
